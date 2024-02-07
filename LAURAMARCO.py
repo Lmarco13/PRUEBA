@@ -18,25 +18,26 @@ def average_daily_sales():
             )
 
             SELECT
-                id AS product_name,
+                product_prouct.id AS product_id,
                 (sale_order_line.product_uom_qty / days_with_stock.days_with_stock) AS average_daily_sales
             FROM
-                product_product AS p
+                product_product 
             JOIN
-                sale_order_line sol ON p.id = sol.product_id
+                sale_order_line ON product_product.id = sale_order_line.product_id
             JOIN
-                days_with_stock ON p.id = days_with_stock.product_id
+                days_with_stock ON product_product.id = days_with_stock.product_id
             JOIN
-                sale_order so ON sol.product_id = so.id
+                sale_order  ON sale_order_line.product_id = sale_order.id
             WHERE
-                so.date_order >= CURRENT_DATE - INTERVAL '60 days'
+                sale_order.date_order >= CURRENT_DATE - INTERVAL '60 days'
             GROUP BY
-                p.id;
+                product_product.id;
             '''
         
         cursor.execute(query)
-
-        for(product_name , average_daily_sales) in cursor:
+        results = cursor.fetchall()
+        
+        for(product_name , average_daily_sales) in results:
             print("La media diaria de ventas en los últimos 60 dias para el producto {},ha sido de {}".format(product_name,average_daily_sales))
 
         cursor.close()
@@ -44,3 +45,7 @@ def average_daily_sales():
 
     except mysql.connector.Error as err : 
         print(err)
+
+
+
+average_daily_sales()
