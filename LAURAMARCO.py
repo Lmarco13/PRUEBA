@@ -18,20 +18,20 @@ def average_daily_sales():
             )
 
             SELECT
-                p.name AS product_name,
+                id AS product_name,
                 (sale_order_line.product_uom_qty / days_with_stock.days_with_stock) AS average_daily_sales
             FROM
-                product_product p
+                product_product AS p
             JOIN
-                sale_order_line  ON p.id = sale_order_online.product_id
-            JOIN
-                sale_order  ON sale_order_online.order_id = sale_order.id
+                sale_order_line sol ON p.id = sol.product_id
             JOIN
                 days_with_stock ON p.id = days_with_stock.product_id
+            JOIN
+                sale_order so ON sol.product_id = so.id
             WHERE
-                sale_order.date >= CURRENT_DATE - INTERVAL '60 days'
+                so.date_order >= CURRENT_DATE - INTERVAL '60 days'
             GROUP BY
-                p.name;
+                p.id;
             '''
         
         cursor.execute(query)
